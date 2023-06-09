@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1 viewport-fit=cover" />
+    <title>SWRPG</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png" />
+    <link rel="manifest" href="img/favicon/site.webmanifest" />
+    <link rel="stylesheet" href="css/swrpg.css" />
+  </head>
+  <body>
+    <main>
+      <div id="content-stats" class="content">
+        <h1>Stats</h1>
+        <div id="stats-list" class="grid"></div>
+      </div>
+      <div id="content-characteristics" class="content">
+        <h1>Characteristics</h1>
+        <div id="characteristics-list" class="grid"></div>
+      </div>
+      <div id="content-skills" class="content">
+        <h1>Skills</h1>
+        <div id="skills-list"></div>
+      </div>
+      <div id="content-settings" class="content">
+        <h1>Settings</h1>
+        <div class="backup-restore-actions">
+          <div id="backup">Backup</div>
+          <div>
+            <label for="restore">Restore</label>
+            <input type="file" id="restore" />
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <nav>
+        <div id="tab-stats"><img src="img/stats.svg" /></div>
+        <div id="tab-characteristics"><img src="img/person.svg" /></div>
+        <div id="tab-skills"><img src="img/skills.svg" /></div>
+        <div id="tab-settings"><img src="img/settings.svg" /></div>
+      </nav>
+    </footer>
+
+    <script src="./js/store.js"></script>
+    <script>
+      const store = new Store();
+
+      const stats = store.getStats();
+      const characteristics = store.getCharacteristics();
+      const skillGroups = store.getSkillGroups();
+
+      function navigateTo(content) {
+        localStorage.setItem('activeTab', content);
+
+        const links = document.querySelector('nav').children;
+        Array.from(links)
+          .filter((c) => c.id.includes(content))
+          .map((c) => c.classList.add('selected'));
+        Array.from(links)
+          .filter((c) => !c.id.includes(content))
+          .map((c) => c.classList.remove('selected'));
+
+        const contents = document.querySelector('main').children;
+        Array.from(contents)
+          .filter((c) => c.id.includes(content))
+          .map((c) => (c.style.display = 'block'));
+        Array.from(contents)
+          .filter((c) => !c.id.includes(content))
+          .map((c) => (c.style.display = 'none'));
+      }
+
+      document.getElementById('tab-stats').addEventListener('click', () => navigateTo('stats'));
+      document.getElementById('tab-characteristics').addEventListener('click', () => navigateTo('characteristics'));
+      document.getElementById('tab-skills').addEventListener('click', () => navigateTo('skills'));
+      document.getElementById('tab-settings').addEventListener('click', () => navigateTo('settings'));
+
+      navigateTo(localStorage.getItem('activeTab') || 'stats');
+
+      /**
+       * Stats
+       */
+      function renderStats() {
+        const statsFragment = document.createDocumentFragment();
+
+        for (const stat of stats) {
+          const statsItem = document.createElement('div');
+          statsItem.className = 'stats-item';
+
+          const statHeader = document.createElement('h2');
+          statHeader.textContent = stat.name;
+
+          const statValues = document.createElement('div');
+          statValues.className = 'stat-values';
+
+          for (const item of stat.items) {
+            const statValue = document.createElement('div');
+            statValue.className = 'stat-value';
+
+            const statValueValue = document.createElement('div');
+            statValueValue.className = 'grid-item-value';
+            statValueValue.setAttribute('contenteditable', true);
+            statValueValue.textContent = item.value;
+
+            statValueValue.addEventListener('blur', function (e) {
+              e.preventDefault();
+              store.setStat(item.id, statValueValue.textContent);
+            });
+
+            statValue.appendChild(statValueValue);
+
+            if (item.name) {
+              const statValueName = document.createElement('div');
+              statValueName.textContent = item.name;
+              statValue.appendChild(statValueName);
+            }
+
+            statValues.appendChild(statValue);
+          }
+
+          statsItem.appendChild(statHeader);
+          statsItem.appendChild(statValues);
+
+          statsFragment.appendChild(statsItem);
+        }
+
+        document.getElementById('stats-list').appendChild(statsFragment);
+      }
+
+      /**
+       * Characteristics
+       */
+      function renderCharacteristics() {
+        const characteristicsFragment = document.createDocumentFragment();
+
+        for (const characteristic of characteristics) {
+          const characteristicsItem = document.createElement('div');
+          characteristicsItem.className = 'characteristics-item';
+
+          const characteristicHeader = document.createElement('h2');
+          characteristicHeader.textContent = characteristic.name;
+
+          const characteristicValues = document.createElement('div');
+          characteristicValues.className = 'characteristic-values';
+
+          for (const item of characteristic.items) {
+            const characteristicValue = document.createElement('div');
+            characteristicValue.className = 'characteristic-value';
+
+            const characteristicValueName = document.createElement('div');
+            characteristicValueName.textContent = item.name;
+
+            const characteristicValueValue = document.createElement('div');
+            characteristicValueValue.className = 'grid-item-value';
+            characteristicValueValue.setAttribute('contenteditable', true);
+            characteristicValueValue.textContent = item.value;
+
+            characteristicValueValue.addEventListener('blur', function (e) {
+              e.preventDefault();
+              store.setCharacteristic(item.id, characteristicValueValue.textContent);
+            });
+
+            characteristicValue.appendChild(characteristicValueName);
+            characteristicValue.appendChild(characteristicValueValue);
+
+            characteristicValues.appendChild(characteristicValue);
+          }
+
+          characteristicsItem.appendChild(characteristicHeader);
+          characteristicsItem.appendChild(characteristicValues);
+
+          characteristicsFragment.appendChild(characteristicsItem);
+        }
+
+        document.getElementById('characteristics-list').appendChild(characteristicsFragment);
+      }
+
+      /**
+       * Skills
+       */
+      function renderSkillGroups() {
+        const skillGroupsFragment = document.createDocumentFragment();
+
+        for (const skillGroup of skillGroups) {
+          const skillGroupHeader = document.createElement('h2');
+          skillGroupHeader.textContent = skillGroup.name;
+
+          const skillItemsFragment = document.createDocumentFragment();
+
+          for (const skill of skillGroup.items) {
+            const skillItem = document.createElement('div');
+            skillItem.className = 'skill-item';
+
+            const skillName = document.createElement('div');
+            skillName.textContent = skill.name;
+
+            const skillCareer = document.createElement('img');
+            skillCareer.src = skill.career ? './img/circle-check.svg' : './img/circle.svg';
+            skillCareer.addEventListener('click', (e) => {
+              e.preventDefault();
+              store.toggleCareer(skill.id);
+              location.reload();
+            });
+
+            const skillRanks = document.createElement('div');
+
+            for (const [i, r] of skill.rank.entries()) {
+              const skillRank = document.createElement('span');
+
+              if (r === 1) {
+                skillRank.textContent = '\u{1F7E9}';
+              } else if (r === 2) {
+                skillRank.textContent = '\u{1F7E8}';
+              } else {
+                skillRank.textContent = '\u{2B1C}';
+              }
+
+              skillRank.addEventListener('click', (e) => {
+                e.preventDefault();
+                store.toggleRank(skill.id, i);
+                location.reload();
+              });
+
+              skillRanks.appendChild(skillRank);
+            }
+
+            skillItem.appendChild(skillName);
+            skillItem.appendChild(skillCareer);
+            skillItem.appendChild(skillRanks);
+
+            skillItemsFragment.appendChild(skillItem);
+          }
+
+          skillGroupsFragment.appendChild(skillGroupHeader);
+          skillGroupsFragment.appendChild(skillItemsFragment);
+        }
+
+        document.getElementById('skills-list').appendChild(skillGroupsFragment);
+      }
+
+      /**
+       * Backup & Restore
+       */
+      document.getElementById('backup').addEventListener('click', () => {
+        const encodedBackupString = encodeURIComponent(JSON.stringify(store.createBackup()));
+        const data = `data:text/json;charset=utf-8,${encodedBackupString}`;
+        const download = document.createElement('a');
+        download.setAttribute('href', data);
+        download.setAttribute('download', `swrpg-backup-${new Date().toISOString()}.json`);
+        document.body.appendChild(download);
+        download.click();
+        document.body.removeChild(download);
+      });
+
+      document.getElementById('restore').addEventListener('click', () => {
+        const fileSelector = document.getElementById('restore');
+        fileSelector.addEventListener('change', (event) => {
+          const fileList = event.target.files;
+          const file = fileList[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.readAsText(file, 'utf-8');
+            reader.onload = function (e) {
+              store.applyBackup(JSON.parse(e.target.result));
+              setTimeout(() => {
+                location.reload();
+              }, 1000);
+            };
+          }
+        });
+      });
+
+      /**
+       * Initialize application
+       */
+      renderStats();
+      renderCharacteristics();
+      renderSkillGroups();
+    </script>
+  </body>
+</html>

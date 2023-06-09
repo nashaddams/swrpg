@@ -1,0 +1,142 @@
+* {
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100vh;
+  max-height: -webkit-fill-available;
+  background-color: #0a1929;
+  color: white;
+}
+
+main {
+  overflow-y: auto;
+}
+
+main > .content {
+  padding: 20px;
+  position: relative;
+}
+
+main > .content h1 {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
+
+main > .content h2 {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+main > .content > .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: 10px;
+}
+
+@media (max-width: 900px) {
+  main > .content > .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 450px) {
+  main > .content > .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Create grid item styling for all grid children */
+main > .content > .grid > * {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+main > .content > .grid .grid-item-value {
+  font-size: 2.2rem;
+  margin: 14px 0;
+}
+
+main > .content#content-stats .stats-item > .stat-values {
+  display: grid;
+  grid-template-columns: repeat(auto-fill);
+  grid-auto-flow: column;
+  grid-gap: 10px;
+}
+
+main > .content#content-skills h2 {
+  margin: 10px 0;
+}
+
+main > .content#content-skills .skill-item {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1fr auto auto;
+  margin-bottom: 3px;
+}
+
+main > .content#content-skills .skill-item:last-child {
+  margin-bottom: 0px;
+}
+
+main > .content#content-skills .skill-item img {
+  height: 20px;
+  cursor: pointer;
+}
+
+main > .content#content-skills .skill-item span {
+  cursor: pointer;
+}
+
+main > .content#content-settings .backup-restore-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+  margin-bottom: 20px;
+}
+
+main > .content#content-settings .backup-restore-actions > * {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+main > .content#content-settings .backup-restore-actions input {
+  display: none;
+}
+
+main > .content#content-settings .backup-restore-actions label {
+  display: block;
+  cursor: pointer;
+}
+
+footer {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+footer > nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  border-top: solid rgba(255, 255, 255, 0.1) 2px;
+}
+
+footer > nav > div {
+  text-align: center;
+  padding: 16px;
+  cursor: pointer;
+}
+
+footer > nav > div > img {
+  height: 32px;
+}
